@@ -11,7 +11,7 @@ username = promptForUsername();
 class ChatApp {
     constructor() {
         this.chatForm = new ChatForm(FORM_SELECTOR, INPUT_SELECTOR);
-        this.chatList = new ChatList(LIST_SELECTOR, 'wonderwoman');
+        this.chatList = new ChatList(LIST_SELECTOR, username);
 
         socket.init('ws://localhost:3001');
         socket.registerOpenHandler(() => {
@@ -32,17 +32,17 @@ class ChatApp {
 
 class ChatMessage {
     constructor({
-        message,
-        username,
-        timestamp = (new Date()).getTime()
+        message: m,
+        user: u = username,
+        timestamp: t = (new Date()).getTime()
     }) {
-        this.message = message;
-        this.username = username;
-        this.timestamp = timestamp;
+        this.message = m;
+        this.user = u;
+        this.timestamp = t;
     }
     serialize() {
         return {
-            username: this.username,
+            username: this.user,
             message: this.message,
             timestamp: this.timestamp
         };
