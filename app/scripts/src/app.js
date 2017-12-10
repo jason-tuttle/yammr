@@ -1,12 +1,17 @@
 import socket from './ws-client';
 import { ChatForm, ChatList, promptForUsername } from './dom';
+import { UserStore } from './storage';
 
 const FORM_SELECTOR = '[data-chat="chat-form"]';
 const INPUT_SELECTOR = '[data-chat="message-input"]';
 const LIST_SELECTOR = '[data-chat="message-list"]';
 
-let username = '';
-username = promptForUsername();
+let userStore = new UserStore('x-yammr/u');
+let username = userStore.get();
+if (!username) {
+    username = promptForUsername();
+    userStore.set(username);
+}
 
 class ChatApp {
     constructor() {
@@ -21,8 +26,10 @@ class ChatApp {
             });
         });
         socket.registerMessageHandler((data) => {
+            console.log('ChatApp data:', data);
             let message = new ChatMessage(data);
             this.chatList.drawMessage(message.serialize());
+            this.chatList.init();
         });
         socket.registerCloseHandler(() => {
 
@@ -42,7 +49,7 @@ class ChatMessage {
     }
     serialize() {
         return {
-            username: this.user,
+            user: this.user,
             message: this.message,
             timestamp: this.timestamp
         };
